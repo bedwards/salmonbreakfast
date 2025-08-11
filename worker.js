@@ -51,7 +51,16 @@ async function createCheckoutSession(env, req) {
     body
   });
   const data = await r.json();
-  if (!data.url) return new Response("Stripe error", { status: 500 });
+
+  if (!r.ok || !data.url) {
+    const debug = `
+      <h1>Stripe Error</h1>
+      <p>Status: ${r.status}</p>
+      <pre>${JSON.stringify(data, null, 2)}</pre>
+    `;
+    return new Response(debug, { status: 500, headers: { "Content-Type": "text/html" } });
+  }
+
   return Response.redirect(data.url, 302);
 }
 
