@@ -12,7 +12,7 @@ binding = "PAGES"
 bucket_name = "ebook-pages"
 
 [vars]
-PRICE_ID = "price_123"         # Stripe Price ID for your ebook (one-time payment)
+PRICE_ID = "price_1Rv0CE0twRCD0Nl9pOwSx0SN"         # Stripe Price ID for your ebook (one-time payment)
 PAGE_COUNT = 201               # total number of pages
 TITLE = "Salmon for Breakfast"
 
