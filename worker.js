@@ -110,7 +110,6 @@ function readerHTML(env, unlocked) {
 </script>`;
   const lockedView = `
 <div class="wrap">
-  <h1>${env.TITLE}</h1>
   <img src="/cover.png" alt="Book cover" style="max-width:100%;height:auto;margin:16px 0;">
   <p>This book is presented one page at a time inside a protected reader. Click the button to purchase and unlock instant access.</p>
   <p><a href="/buy"><button>Buy & Unlock</button></a></p>
