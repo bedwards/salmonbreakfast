@@ -1,5 +1,5 @@
 # wrangler.toml
-name = "ebook"
+name = "salmonbreakfast"
 main = "worker.js"
 compatibility_date = "2024-11-12"
 
