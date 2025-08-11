@@ -65,20 +65,42 @@ async function createCheckoutSession(env, req) {
 }
 
 async function claim(env, url) {
+  const home = url.origin + "/";                     // absolute URL for redirects
   const cs = url.searchParams.get("cs");
-  if (!cs) return Response.redirect("/", 302);
-  const r = await fetch("https://api.stripe.com/v1/checkout/sessions/" + cs, {
-    headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` }
-  });
-  const data = await r.json();
-  if (data.payment_status !== "paid") return new Response("Payment not verified", { status: 402 });
+  if (!cs) return Response.redirect(home, 302);
+
+  const r = await fetch(
+    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(cs)}`,
+    { headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } }
+  );
+
+  const text = await r.text();
+  let data; try { data = JSON.parse(text); } catch { data = { raw: text } }
+
+  if (!r.ok) {
+    return new Response(
+      `<h1>Stripe claim error</h1><p>Status: ${r.status}</p><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`,
+      { status: 502, headers: { "Content-Type": "text/html" } }
+    );
+  }
+
+  if (data.payment_status !== "paid") {
+    return new Response(
+      `<h1>Payment not verified</h1><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>`,
+      { status: 402, headers: { "Content-Type": "text/html" } }
+    );
+  }
 
   const sid = cryptoRandom(24);
   await env.SESSIONS.put(sid, "ok", { expirationTtl: 60 * 60 * 24 * 365 });
-  const res = Response.redirect("/", 302);
-  res.headers.set("Set-Cookie", `ebook_session=${sid}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60*60*24*365}`);
+
+  const res = Response.redirect(home, 302);          // absolute redirect back home
+  res.headers.set("Set-Cookie",
+    `ebook_session=${sid}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60*60*24*365}`);
   return res;
 }
+
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
 
 async function servePage(env, req, url, sid) {
   const ok = sid && await env.SESSIONS.get(sid);
