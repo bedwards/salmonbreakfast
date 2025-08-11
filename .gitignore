@@ -1,0 +1,22 @@
+# Node/npm
+node_modules/
+npm-debug.log
+package-lock.json
+
+# Wrangler build output
+dist/
+.workers/
+
+# Local environment files (never commit secrets)
+.env
+.env.*
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Anything temporary
+tmp/

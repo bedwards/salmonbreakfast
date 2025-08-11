@@ -1,0 +1,20 @@
+# wrangler.toml
+name = "ebook"
+main = "worker.js"
+compatibility_date = "2024-11-12"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "61409ed5a8db4af9a12994e511a01966"
+
+[[r2_buckets]]
+binding = "PAGES"
+bucket_name = "ebook-pages"
+
+[vars]
+PRICE_ID = "price_123"         # Stripe Price ID for your ebook (one-time payment)
+PAGE_COUNT = 201               # total number of pages
+TITLE = "Salmon for Breakfast"
+
+# Set these secrets with `wrangler secret put ...`
+# STRIPE_SECRET_KEY
