@@ -94,11 +94,14 @@ async function claim(env, url) {
   const sid = cryptoRandom(24);
   await env.SESSIONS.put(sid, "ok", { expirationTtl: 60 * 60 * 24 * 365 });
 
-  const res = Response.redirect(home, 302);          // absolute redirect back home
-  res.headers.set("Set-Cookie",
-    `ebook_session=${sid}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${60*60*24*365}`);
-  return res;
-}
+  const cookie = `ebook_session=${sid}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${60*60*24*365}`;
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: home,            // e.g. url.origin + "/"
+      "Set-Cookie": cookie
+  }
+});
 
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
 
