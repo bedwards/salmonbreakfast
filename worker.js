@@ -8,20 +8,26 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
-    const sessionId = getSessionId(req);
-    if (url.pathname === "/") return env.SESSIONS.get(sessionId).then(s => s ? readerHTML(env, true) : readerHTML(env, false));
+    const sid = getSessionId(req);
+
+    if (url.pathname === "/") {
+      const unlocked = sid ? !!(await env.SESSIONS.get(sid)) : false;
+      return readerHTML(env, unlocked);
+    }
+
     if (url.pathname === "/buy") return createCheckoutSession(env, req);
     if (url.pathname === "/claim") return claim(env, url);
-    if (url.pathname.startsWith("/page/")) return servePage(env, req, url, sessionId);
+    if (url.pathname.startsWith("/page/")) return servePage(env, req, url, sid);
+
     return new Response("Not found", { status: 404 });
   }
 };
 
 function getSessionId(req) {
-  const cookie = req.headers.get("Cookie") || "";
-  const m = cookie.match(/ebook_session=([a-zA-Z0-9_-]+)/);
-  return m ? m[1] : "";
+  const m = (req.headers.get("Cookie") || "").match(/ebook_session=([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
 }
+
 
 async function createCheckoutSession(env, req) {
   const origin = new URL(req.url).origin;
