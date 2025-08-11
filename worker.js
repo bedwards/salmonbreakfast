@@ -17,6 +17,13 @@ export default {
 
     if (url.pathname === "/buy") return createCheckoutSession(env, req);
     if (url.pathname === "/claim") return claim(env, url);
+
+    if (url.pathname === "/cover.png") {
+      const obj = await env.PAGES.get("cover.png");
+      if (!obj) return new Response("Not found", { status: 404 });
+      return new Response(obj.body, { headers: { "Content-Type": "image/png" } });
+    }
+
     if (url.pathname.startsWith("/page/")) return servePage(env, req, url, sid);
 
     return new Response("Not found", { status: 404 });
@@ -104,6 +111,7 @@ function readerHTML(env, unlocked) {
   const lockedView = `
 <div class="wrap">
   <h1>${env.TITLE}</h1>
+  <img src="/cover.png" alt="Book cover" style="max-width:100%;height:auto;margin:16px 0;">
   <p>This book is presented one page at a time inside a protected reader. Click the button to purchase and unlock instant access.</p>
   <p><a href="/buy"><button>Buy & Unlock</button></a></p>
 </div>`;
